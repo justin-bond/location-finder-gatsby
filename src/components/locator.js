@@ -1,106 +1,96 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from 'react'
 
-import GoogleMap from './googlemap'
+// import GoogleMap from './googlemap'
+
+import LocatorMap from './locatorMap'
+import LocatorForm from './locatorForm'
+import LocatorLocationList from './locatorLocationList'
 
 const Locator = () => {
 
   const [locatorState, setLocatorState] = useState({
-    locatorZip: '',
+    googleScriptLoaded: false,
+    gmarkers: [],
+    locatorForm: {},
     locatorResponse: '',
     locations: []
   });
 
-  const handleChange = (e) => {
-   const target = e.target;
-   const value = target.value;
-   const name = target.name;
+  useEffect(() => {
+    console.log('loaded');
+    if (!window.google) {
+      var s = document.createElement('script');
+      s.type = 'text/javascript';
+      s.src = `https://maps.google.com/maps/api/js?key=${process.env.GATSBY_GOOGLE_API_KEY}`;
+      var x = document.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+      // Below is important. 
+      //We cannot access google.maps until it's finished loading
+      s.addEventListener('load', e => {
+        setLocatorState((prevState) => {
+          return { 
+            ...prevState,
+            googleScriptLoaded: true
+          };
+        });
+      })
+    } else {
+      setLocatorState((prevState) => {
+        return { 
+          ...prevState,
+          googleScriptLoaded: true
+        };
+      });
+    }
+  }, [locatorState.locations]);
 
-   setLocatorState(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+  const setLocatorFormResponse = (form, response) => {
+    setLocatorState((prevState) => {
+      return { 
+        ...prevState,
+        locatorForm: form,
+        locatorResponse: response,
+        locations: response.RESULTS.STORES.STORE
+      };
+    });
+  };
+
+  const setGMarkers = (index, marker) => {
+    const newgmarkers = locatorState.gmarkers;
+    newgmarkers[index] = marker
+    setLocatorState((prevState) => {
+      return { 
+        ...prevState,
+        gmarkers: newgmarkers
+      };
+    });
   }
 
-  const submitForm = (event) => {
-    event.preventDefault();
+  console.log(locatorState)
 
-    fetch(`http://productlocator.iriworldwide.com/productlocator/servlet/ProductLocatorEngine?clientid=155&productfamilyid=LING&producttype=upc&productid=1087801002&zip=${locatorState.locatorZip}&outputtype=json`, {
-      method: 'GET'
-    }).then(
-      (res) => { return res.json(); }
-    ).catch(
-      (error) => {
-        console.error('Error:', error); // eslint-disable-line no-console
-      }
-    ).then(
-      (response) => {
-        // console.log('response:', response);
-        setLocatorState((prevState) => {
-          return { ...prevState, locations: response.RESULTS.STORES.STORE };
-        });
-      }
-    )
+  const locationClicked = (e) => {
+    const i = e.currentTarget.dataset.index;
+    console.log(i);
+    window.google.maps.event.trigger(locatorState.gmarkers[i], 'click');
   };
 
-  const renderLocationDirections = (location) => {
-    let url = `https://www.google.com/maps/dir/`; // Google Map url for directions
-    url += `+${locatorState.locatorZip}`; // adds start location
-    url += `/${location.NAME}`; // add locations name
-    url += `,+${location.ADDRESS}`; // add locations address
-    url += `,+${location.CITY}`; // add locations city
-    url += `,+${location.STATE}`; // add locations state
-    url += `+${location.ZIP}`; // add locations zip
-    return url;
-  };
-
-  const renderLocations = (key, index) => {
-    const location = key;
-
-    return (
-      <div key={location.NAME + index} data-index={index}>
-        <div>
-          { location.NAME }
-        </div>
-        <div>
-          { location.ADDRESS }<br />
-          { location.CITY }, { location.STATE } { location.ZIP }<br />
-          { location.DISTANCE } Miles | <a href={renderLocationDirections(location)} target={'_blank'}>Directions >></a>
-        </div>
-        <br />
-      </div>
-    );
-  };
-
-  // console.log(locatorState);
-
+      // <GoogleMap id={'myMap'} locations={locatorState.locations} />
   return (
     <div>
-      <form className={'form'} onSubmit={(e) => { submitForm(e); }}>
-        <label htmlFor={'zip'}>
-          Zip*
-          <input type={'text'} name={'locatorZip'} id={'zip'} value={locatorState.locatorZip} onChange={(e) => { handleChange(e); }} required />
-        </label>
-        <button type={'submit'}>
-          Search
-        </button>
-      </form>
-      <GoogleMap
-        id={'myMap'}
+      <LocatorForm setLocatorFormResponse={setLocatorFormResponse}/>
+      {
+        locatorState.googleScriptLoaded &&
+        <LocatorMap 
+          id={'map-canvas'}
+          locations={locatorState.locations}
+          setGMarkers={setGMarkers}
+        />
+      }
+      <LocatorLocationList
+        zip={locatorState.locatorForm.locatorZip}
         locations={locatorState.locations}
+        locationClicked={locationClicked}
       />
-      <div>
-        Locations: 
-        {
-          locatorState.locations.length > 0 ?
-          <div>
-            {locatorState.locations.map(renderLocations)}
-          </div>
-          :
-          <div>
-            no locations :(
-          </div>
-        }
-      </div>
     </div>
   )
 

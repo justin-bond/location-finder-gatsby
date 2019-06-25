@@ -1,11 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from 'react'
 
-const GoogleMap = (props) => {
-
+const LocatorMap = (props) => {
   // create initial variables
   let map = null;
   let isDraggable = true;
-  let gmarkers = [];
   let infowindow;
   let mapStyles = [
     {
@@ -104,7 +102,7 @@ const GoogleMap = (props) => {
     });
 
 
-    gmarkers[index] = marker;
+    props.setGMarkers(index, marker);
 
     // create the marker content
     const markerHtml = `
@@ -123,7 +121,8 @@ const GoogleMap = (props) => {
     });
   }
 
-  const onScriptLoad = () => {
+  useEffect(() => {
+    console.log('load')
     // Initial coordinates
     let latlng = new window.google.maps.LatLng(34.0504989,-118.25); //Los Angeles
 
@@ -160,36 +159,13 @@ const GoogleMap = (props) => {
       // loop through locations to mark on the map
       greatPlaces.map(renderMarker);
     }
-  }
-
-  useEffect(() => {
-    if (!window.google) {
-      var s = document.createElement('script');
-      s.type = 'text/javascript';
-      s.src = `https://maps.google.com/maps/api/js?key=${process.env.GATSBY_GOOGLE_API_KEY}`;
-      var x = document.getElementsByTagName('script')[0];
-      x.parentNode.insertBefore(s, x);
-      // Below is important. 
-      //We cannot access google.maps until it's finished loading
-      s.addEventListener('load', e => {
-        onScriptLoad()
-      })
-    } else {
-      onScriptLoad()
-    }
   }, [props.locations]);
-
-  const locationClicked = (e) => {
-    const i = e.target.dataset.index;
-    window.google.maps.event.trigger(gmarkers[i], 'click');
-  };
 
   return (
     <div>
-    <div onClick={locationClicked} data-index={0}>click me</div>
-    <div id={props.id} style={{ height: '500px', width: '100%' }} />
+      <div id={props.id} style={{ height: '500px', width: '100%' }} />
     </div>
   )
 }
 
-export default GoogleMap
+export default LocatorMap
