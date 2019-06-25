@@ -19,7 +19,7 @@ const LocatorForm = (props) => {
   const submitForm = (event) => {
     event.preventDefault();
 
-    fetch(`http://productlocator.iriworldwide.com/productlocator/servlet/ProductLocatorEngine?clientid=155&productfamilyid=LING&producttype=upc&productid=1087801002&zip=${locatorFormState.locatorZip}&outputtype=json`, {
+    fetch(`https://productlocator.iriworldwide.com/productlocator/servlet/ProductLocatorEngine?clientid=155&productfamilyid=LING&producttype=upc&productid=1087801002&zip=${locatorFormState.locatorZip}&outputtype=json`, {
       method: 'GET'
     }).then(
       (res) => { return res.json(); }

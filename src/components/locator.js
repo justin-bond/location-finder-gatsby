@@ -17,7 +17,6 @@ const Locator = () => {
   });
 
   useEffect(() => {
-    console.log('loaded');
     if (!window.google) {
       var s = document.createElement('script');
       s.type = 'text/javascript';
@@ -66,11 +65,8 @@ const Locator = () => {
     });
   }
 
-  console.log(locatorState)
-
   const locationClicked = (e) => {
     const i = e.currentTarget.dataset.index;
-    console.log(i);
     window.google.maps.event.trigger(locatorState.gmarkers[i], 'click');
   };
 
@@ -78,19 +74,25 @@ const Locator = () => {
   return (
     <div>
       <LocatorForm setLocatorFormResponse={setLocatorFormResponse}/>
-      {
-        locatorState.googleScriptLoaded &&
-        <LocatorMap 
-          id={'map-canvas'}
+      <div style={{
+        display: `grid`,
+        gridTemplateColumns: `repeat(2, 1fr)`,
+      }}>
+        <LocatorLocationList
+          zip={locatorState.locatorForm.locatorZip}
           locations={locatorState.locations}
-          setGMarkers={setGMarkers}
+          locationClicked={locationClicked}
         />
-      }
-      <LocatorLocationList
-        zip={locatorState.locatorForm.locatorZip}
-        locations={locatorState.locations}
-        locationClicked={locationClicked}
-      />
+        {
+          locatorState.googleScriptLoaded &&
+          <LocatorMap 
+            id={'map-canvas'}
+            usersZip={locatorState.locatorForm.locatorZip}
+            locations={locatorState.locations}
+            setGMarkers={setGMarkers}
+          />
+        }
+      </div>
     </div>
   )
 

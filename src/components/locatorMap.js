@@ -90,7 +90,7 @@ const LocatorMap = (props) => {
       strokeColor: '#000',
       fillColor: '#fff',
       fillOpacity: 1,
-      scale: 6
+      scale: 7
     };
 
     // set the marker on the map
@@ -101,12 +101,12 @@ const LocatorMap = (props) => {
       id: index
     });
 
-
+    // set the gmarkers array to be used for location list clicks
     props.setGMarkers(index, marker);
 
     // create the marker content
     const markerHtml = `
-      <div class="markerinfo" style="min-height:90px;">
+      <div class="markerinfo" style="min-height:90px;min-width:90px;">
         ${key.name}
       </div>
     `;
@@ -122,13 +122,13 @@ const LocatorMap = (props) => {
   }
 
   useEffect(() => {
-    console.log('load')
+    console.log('map load')
     // Initial coordinates
-    let latlng = new window.google.maps.LatLng(34.0504989,-118.25); //Los Angeles
+    let latlng = new window.google.maps.LatLng(39.8283,-98.5795); // Center of USA
 
     // create map options object
     const mapOptions = {
-      zoom: 9,
+      zoom: props.locations.length > 0 ? 9 : 4,
       center: latlng,
       scrollwheel: false,
       draggable: isDraggable,
@@ -144,20 +144,32 @@ const LocatorMap = (props) => {
 
     // if their are locations
     if (props.locations.length > 0) {
-      // reset the coordinates to the users input
-      latlng = new window.google.maps.LatLng(34.0504989,-118.25); // USERS COORDINATES
-      
-      // create the users marker on the map
-      new window.google.maps.Marker({
-        position: latlng,
-        map: map
-      });
-      
-      // center the map to the users input coordinates
-      map.setCenter(latlng);
+      const geocoder = new window.google.maps.Geocoder();
 
-      // loop through locations to mark on the map
-      greatPlaces.map(renderMarker);
+      geocoder.geocode({
+        'address': props.usersZip
+      }, (results, status) => {
+        // console.log('results', results)
+        // console.log('status', status)
+        const usersLat = results[0].geometry.location.lat();
+        const usersLng = results[0].geometry.location.lng();
+
+        // reset the coordinates to the users input
+        latlng = new window.google.maps.LatLng(usersLat,usersLng);
+        
+        // create the users marker on the map
+        new window.google.maps.Marker({
+          position: latlng,
+          map: map
+        });
+        
+        // center the map to the users input coordinates
+        map.setCenter(latlng);
+
+        // loop through locations to mark on the map
+        greatPlaces.map(renderMarker);
+      });
+
     }
   }, [props.locations]);
 
