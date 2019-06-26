@@ -59,26 +59,49 @@ const LocatorMap = (props) => {
   ]
 
   // placeholder locations for map // TO BE REMOVED
-  const greatPlaces = [
+  const places91709 = [
     {
-      name: 'Orange',
-      lat: 33.79609,
-      lng: -118.086738
+      name: 'ALBERTSONS',
+      lat: 33.9662754,
+      lng: -117.7285968
     },
     {
-      name: 'Los Angeles',
-      lat: 34.0204989,
-      lng: -118.4117325
+      name: 'WALMART SUPERCENTER',
+      lat: 33.9774765,
+      lng: -117.7412652
     },
     {
-      name: 'El Centro',
-      lat: 32.646719000000132,
-      lng: -116.105698
+      name: 'ALBERTSONS',
+      lat: 33.9803252,
+      lng: -117.7475778
     },
     {
-      name: 'Bakersfield',
-      lat: 35.483652,
-      lng: -120.014602
+      name: 'ALBERTSONS',
+      lat: 33.9974693,
+      lng: -117.7427473
+    }
+  ];
+
+  const places92606 = [
+    {
+      name: 'ALBERTSONS',
+      lat: 33.6874781,
+      lng: -117.8304765
+    },
+    {
+      name: 'RALPHS',
+      lat: 33.6854275,
+      lng: -117.8379481
+    },
+    {
+      name: 'RALPHS FRESH FARE',
+      lat: 33.7032797,
+      lng: -117.8430745
+    },
+    {
+      name: 'ALBERTSONS',
+      lat: 33.6706145,
+      lng: -117.8416399
     }
   ];
 
@@ -128,7 +151,7 @@ const LocatorMap = (props) => {
 
     // create map options object
     const mapOptions = {
-      zoom: props.locations.length > 0 ? 9 : 4,
+      zoom: props.locations.length > 0 ? 12 : 4,
       center: latlng,
       scrollwheel: false,
       draggable: isDraggable,
@@ -167,7 +190,11 @@ const LocatorMap = (props) => {
         map.setCenter(latlng);
 
         // loop through locations to mark on the map
-        greatPlaces.map(renderMarker);
+        if (props.usersZip === '91709') {
+          places91709.map(renderMarker);
+        } else {
+          places92606.map(renderMarker);
+        }
       });
 
     }

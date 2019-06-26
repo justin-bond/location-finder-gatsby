@@ -19,7 +19,7 @@ const LocatorForm = (props) => {
   const submitForm = (event) => {
     event.preventDefault();
 
-    fetch(`https://productlocator.iriworldwide.com/productlocator/servlet/ProductLocatorEngine?clientid=155&productfamilyid=LING&producttype=upc&productid=1087801002&zip=${locatorFormState.locatorZip}&outputtype=json`, {
+    fetch(`https://productlocator.iriworldwide.com/productlocator/servlet/ProductLocatorEngine?clientid=155&productfamilyid=LING&producttype=upc&productid=1087801002&zip=${locatorFormState.locatorZip}&storesperpage=25&outputtype=json`, {
       method: 'GET'
     }).then(
       (res) => { return res.json(); }
@@ -30,7 +30,11 @@ const LocatorForm = (props) => {
     ).then(
       (response) => {
         // console.log('response:', response);
-        props.setLocatorFormResponse(locatorFormState, response);
+        if (response.RESULTS.SUCCESS_CODE === 0) {
+          props.setLocatorFormResponse(locatorFormState, response);
+        } else {
+          alert(response.RESULTS.ERROR)
+        }
       }
     )
   };
