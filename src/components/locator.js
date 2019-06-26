@@ -13,10 +13,35 @@ const Locator = () => {
     gmarkers: [],
     locatorForm: {},
     locatorResponse: '',
-    locations: []
+    locations: [],
+    products: []
   });
 
+  const grabProductList = (scriptLoaded) => {
+    fetch(`https://productlocator.iriworldwide.com/productlocator/products?client_id=155&brand_id=LING&output=json `, {
+      method: 'GET'
+    }).then(
+      (res) => { return res.json(); }
+    ).catch(
+      (error) => {
+        console.error('Error:', error); // eslint-disable-line no-console
+      }
+    ).then(
+      (response) => {
+        // console.log('response:', response);
+        setLocatorState((prevState) => {
+          return { 
+            ...prevState,
+            googleScriptLoaded: scriptLoaded,
+            products: response.products.product
+          };
+        });
+      }
+    )
+  };
+
   useEffect(() => {
+    const scriptLoaded = true;
     if (!window.google) {
       var s = document.createElement('script');
       s.type = 'text/javascript';
@@ -26,22 +51,12 @@ const Locator = () => {
       // Below is important. 
       //We cannot access google.maps until it's finished loading
       s.addEventListener('load', e => {
-        setLocatorState((prevState) => {
-          return { 
-            ...prevState,
-            googleScriptLoaded: true
-          };
-        });
+        grabProductList(scriptLoaded);
       })
     } else {
-      setLocatorState((prevState) => {
-        return { 
-          ...prevState,
-          googleScriptLoaded: true
-        };
-      });
+      grabProductList(scriptLoaded);
     }
-  }, [locatorState.locations]);
+  }, []);
 
   const setLocatorFormResponse = (form, response) => {
     setLocatorState((prevState) => {
@@ -73,7 +88,8 @@ const Locator = () => {
       // <GoogleMap id={'myMap'} locations={locatorState.locations} />
   return (
     <div>
-      <LocatorForm setLocatorFormResponse={setLocatorFormResponse}/>
+      <div style={{fontWeight: 'bold'}}>only 91709/92606 zip locations are hard coded for map (TEMPORARY)</div>
+      <LocatorForm products={locatorState.products} setLocatorFormResponse={setLocatorFormResponse}/>
       <div style={{
         display: `grid`,
         gridTemplateColumns: `repeat(2, 1fr)`,

@@ -145,7 +145,7 @@ const LocatorMap = (props) => {
   }
 
   useEffect(() => {
-    console.log('map load')
+    // console.log('map load')
     // Initial coordinates
     let latlng = new window.google.maps.LatLng(39.8283,-98.5795); // Center of USA
 

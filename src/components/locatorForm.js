@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 const LocatorForm = (props) => {
   const [locatorFormState, setLocatorFormState] = useState({
     locatorZip: '',
+    locatorProduct: ''
   });
 
   const handleChange = (e) => {
@@ -16,10 +17,14 @@ const LocatorForm = (props) => {
     }));
   }
 
+  const renderProductOptions = (key) => {
+    return <option key={key.upc_code} value={key.upc_code}>{key.upc_name}</option>
+  };
+
   const submitForm = (event) => {
     event.preventDefault();
 
-    fetch(`https://productlocator.iriworldwide.com/productlocator/servlet/ProductLocatorEngine?clientid=155&productfamilyid=LING&producttype=upc&productid=1087801002&zip=${locatorFormState.locatorZip}&storesperpage=25&outputtype=json`, {
+    fetch(`https://productlocator.iriworldwide.com/productlocator/servlet/ProductLocatorEngine?clientid=155&productfamilyid=LING&producttype=upc&productid=${locatorFormState.locatorProduct}&zip=${locatorFormState.locatorZip}&storesperpage=25&outputtype=json`, {
       method: 'GET'
     }).then(
       (res) => { return res.json(); }
@@ -41,6 +46,12 @@ const LocatorForm = (props) => {
 
   return (
     <form className={'form'} onSubmit={(e) => { submitForm(e); }}>
+      <label htmlFor={'zip'}>
+        Product*
+        <select name={'locatorProduct'} id={'product'} value={locatorFormState.locatorProduct} onChange={(e) => { handleChange(e); }}>
+          {props.products.map(renderProductOptions)}
+        </select>
+      </label>
       <label htmlFor={'zip'}>
         Zip*
         <input type={'text'} name={'locatorZip'} id={'zip'} value={locatorFormState.locatorZip} onChange={(e) => { handleChange(e); }} required />
