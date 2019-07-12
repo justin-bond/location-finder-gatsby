@@ -56,53 +56,6 @@ const LocatorMap = (props) => {
         }
       ]
     }
-  ]
-
-  // placeholder locations for map // TO BE REMOVED
-  const places91709 = [
-    {
-      name: 'ALBERTSONS',
-      lat: 33.9662754,
-      lng: -117.7285968
-    },
-    {
-      name: 'WALMART SUPERCENTER',
-      lat: 33.9774765,
-      lng: -117.7412652
-    },
-    {
-      name: 'ALBERTSONS',
-      lat: 33.9803252,
-      lng: -117.7475778
-    },
-    {
-      name: 'ALBERTSONS',
-      lat: 33.9974693,
-      lng: -117.7427473
-    }
-  ];
-
-  const places92606 = [
-    {
-      name: 'ALBERTSONS',
-      lat: 33.6874781,
-      lng: -117.8304765
-    },
-    {
-      name: 'RALPHS',
-      lat: 33.6854275,
-      lng: -117.8379481
-    },
-    {
-      name: 'RALPHS FRESH FARE',
-      lat: 33.7032797,
-      lng: -117.8430745
-    },
-    {
-      name: 'ALBERTSONS',
-      lat: 33.6706145,
-      lng: -117.8416399
-    }
   ];
 
   const renderMarker= (key, index) => {
@@ -118,7 +71,7 @@ const LocatorMap = (props) => {
 
     // set the marker on the map
     const marker = new window.google.maps.Marker({
-      position: { lat: key.lat, lng: key.lng },
+      position: { lat: Number(key.LATITUDE), lng: Number(key.LONGITUDE) },
       map: map,
       icon: icon,
       id: index
@@ -130,7 +83,7 @@ const LocatorMap = (props) => {
     // create the marker content
     const markerHtml = `
       <div class="markerinfo" style="min-height:90px;min-width:90px;">
-        ${key.name}
+        ${key.NAME}
       </div>
     `;
 
@@ -151,7 +104,7 @@ const LocatorMap = (props) => {
 
     // create map options object
     const mapOptions = {
-      zoom: props.locations.length > 0 ? 12 : 4,
+      zoom: props.locations.length > 0 ? 11 : 4,
       center: latlng,
       scrollwheel: false,
       draggable: isDraggable,
@@ -190,11 +143,12 @@ const LocatorMap = (props) => {
         map.setCenter(latlng);
 
         // loop through locations to mark on the map
-        if (props.usersZip === '91709') {
-          places91709.map(renderMarker);
-        } else {
-          places92606.map(renderMarker);
-        }
+        props.locations.map(renderMarker);
+        // if (props.usersZip === '91709') {
+        //   places91709.map(renderMarker);
+        // } else {
+        //   places92606.map(renderMarker);
+        // }
       });
 
     }

@@ -49,6 +49,7 @@ const LocatorForm = (props) => {
       <label htmlFor={'zip'}>
         Product*
         <select name={'locatorProduct'} id={'product'} value={locatorFormState.locatorProduct} onChange={(e) => { handleChange(e); }}>
+          <option value="">-- Please Select Option --</option>
           {props.products.map(renderProductOptions)}
         </select>
       </label>
