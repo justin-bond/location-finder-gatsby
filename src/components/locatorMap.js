@@ -104,7 +104,7 @@ const LocatorMap = (props) => {
 
     // create map options object
     const mapOptions = {
-      zoom: props.locations.length > 0 ? 11 : 4,
+      zoom: props.usersZip ? 11 : 4,
       center: latlng,
       scrollwheel: false,
       draggable: isDraggable,
@@ -119,7 +119,7 @@ const LocatorMap = (props) => {
     );
 
     // if their are locations
-    if (props.locations.length > 0) {
+    if (props.usersZip) {
       const geocoder = new window.google.maps.Geocoder();
 
       geocoder.geocode({
@@ -141,14 +141,10 @@ const LocatorMap = (props) => {
         
         // center the map to the users input coordinates
         map.setCenter(latlng);
-
-        // loop through locations to mark on the map
-        props.locations.map(renderMarker);
-        // if (props.usersZip === '91709') {
-        //   places91709.map(renderMarker);
-        // } else {
-        //   places92606.map(renderMarker);
-        // }
+        if (props.locations.length > 0) {
+          // loop through locations to mark on the map
+          props.locations.map(renderMarker);
+        }
       });
 
     }

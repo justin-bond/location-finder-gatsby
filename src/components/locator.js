@@ -88,7 +88,6 @@ const Locator = () => {
       // <GoogleMap id={'myMap'} locations={locatorState.locations} />
   return (
     <div>
-      <div style={{fontWeight: 'bold'}}>only 91709/92606 zip locations are hard coded for map (TEMPORARY)</div>
       <LocatorForm products={locatorState.products} setLocatorFormResponse={setLocatorFormResponse}/>
       <div style={{
         display: `grid`,
