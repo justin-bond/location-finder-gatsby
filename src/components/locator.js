@@ -105,6 +105,7 @@ const Locator = () => {
             usersZip={locatorState.locatorForm.locatorZip}
             locations={locatorState.locations}
             setGMarkers={setGMarkers}
+            markers={locatorState.gmarkers}
           />
         }
       </div>

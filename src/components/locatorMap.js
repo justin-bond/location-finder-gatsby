@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const LocatorMap = (props) => {
   // create initial variables
-  let map = null;
-  let isDraggable = true;
+  const [userMarkerState, setUserMarkerState] = useState(null);
+  const [mapState, setMapState] = useState(null);
+  let latlng = new window.google.maps.LatLng(39.8283,-98.5795); // Center of USA
+  const isDraggable = true;
   let infowindow;
-  let mapStyles = [
+  const mapStyles = [
     {
       stylers: [
         {
@@ -57,8 +59,24 @@ const LocatorMap = (props) => {
       ]
     }
   ];
+  const mapOptions = {
+    zoom: 4,
+    center: latlng,
+    scrollwheel: false,
+    draggable: isDraggable,
+    mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+    styles: mapStyles
+  };
 
-  const renderMarker= (key, index) => {
+  const clearMarkers = () => {
+    if (userMarkerState)
+      userMarkerState.setMap(null);
+
+    for (var i = 0; i < props.markers.length; i++)
+      props.markers[i].setMap(null);
+  }
+
+  const renderMarker = (key, index) => {
 
     // create the marker icon for each location
     const icon = {
@@ -72,7 +90,7 @@ const LocatorMap = (props) => {
     // set the marker on the map
     const marker = new window.google.maps.Marker({
       position: { lat: Number(key.LATITUDE), lng: Number(key.LONGITUDE) },
-      map: map,
+      map: mapState,
       icon: icon,
       id: index
     });
@@ -82,8 +100,13 @@ const LocatorMap = (props) => {
 
     // create the marker content
     const markerHtml = `
-      <div class="markerinfo" style="min-height:90px;min-width:90px;">
-        ${key.NAME}
+      <div class="markerinfo" style="min-height:90px;min-width:150px;">
+        ${key.NAME}<br /><br />
+        <em>
+          ${key.ADDRESS}<br />
+          ${key.CITY}, ${key.STATE} ${key.ZIP}
+        </em><br /><br />
+        ${key.DISTANCE} Miles
       </div>
     `;
 
@@ -93,33 +116,24 @@ const LocatorMap = (props) => {
           infowindow.close();
       }
       infowindow = new window.google.maps.InfoWindow({content: markerHtml});
-      infowindow.open(map, marker);
+      infowindow.open(mapState, marker);
     });
   }
 
   useEffect(() => {
-    // console.log('map load')
-    // Initial coordinates
-    let latlng = new window.google.maps.LatLng(39.8283,-98.5795); // Center of USA
-
-    // create map options object
-    const mapOptions = {
-      zoom: props.usersZip ? 11 : 4,
-      center: latlng,
-      scrollwheel: false,
-      draggable: isDraggable,
-      mapTypeId: window.google.maps.MapTypeId.ROADMAP,
-      styles: mapStyles
-    };
-
-    // set the map
-    map = new window.google.maps.Map(
+    setMapState(new window.google.maps.Map(
       document.getElementById(props.id),
       mapOptions
-    );
+    ));
+  }, []);
 
-    // if their are locations
+  useEffect(() => {
+    // console.log('map load')
+
+    // if zip is entered
     if (props.usersZip) {
+      clearMarkers();
+
       const geocoder = new window.google.maps.Geocoder();
 
       geocoder.geocode({
@@ -134,13 +148,14 @@ const LocatorMap = (props) => {
         latlng = new window.google.maps.LatLng(usersLat,usersLng);
         
         // create the users marker on the map
-        new window.google.maps.Marker({
+        setUserMarkerState(new window.google.maps.Marker({
           position: latlng,
-          map: map
-        });
+          map: mapState
+        }));
         
         // center the map to the users input coordinates
-        map.setCenter(latlng);
+        mapState.setCenter(latlng);
+        mapState.setZoom(props.usersZip ? 11 : 4);
         if (props.locations.length > 0) {
           // loop through locations to mark on the map
           props.locations.map(renderMarker);
